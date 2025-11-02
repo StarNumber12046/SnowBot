@@ -7,7 +7,7 @@ export default {
   async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
     const imageResponse = await fetch(
-      "https://morrisapi.starnumber12046.workers.dev/morris"
+      "https://snowapi-vercel.vercel.app/cat"
     );
     const imageData = Buffer.from(await imageResponse.arrayBuffer());
     console.log(imageData.length);
