@@ -3,7 +3,6 @@ WORKDIR /app
 RUN apt-get update --allow-releaseinfo-change && apt-get install -y ffmpeg
 RUN mkdir src assets dist
 COPY src src
-COPY assets assets
 COPY tsconfig.json .
 COPY package.json .
 COPY pnpm-lock.yaml .
