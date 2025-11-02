@@ -11,7 +11,6 @@ import path from "path";
 import dotenv from "dotenv";
 import type { ClientType, EventType, CommandType } from "./types.js";
 import { fileURLToPath } from "url";
-import { getVoiceChannels, hasMembers, playAudio } from "./utils/voice.js";
 // import { askLimit } from "./utils/redis.js";
 
 console.log("Starting up Snow");
@@ -72,33 +71,9 @@ for (const file of eventFiles) {
   client.events.set(event.eventType, event);
 }
 
-async function playMeowOnGuilds() {
-  const guilds = client.guilds.cache.filter(
-    (guild) => guild.members.cache.filter((member) => member.user.bot).size > 0
-  );
-  guilds.forEach(async (guild) => {
-    getVoiceChannels(guild).forEach(async (channel) => {
-      console.log("Got channel " + channel.name);
-      if (hasMembers(channel)) {
-        console.log("Has members");
-        const randomValue = Math.random();
-        console.log(randomValue);
-        if (channel.name === "121.5") {
-          console.log("Meowing on guard!");
-        }
-        if (randomValue < 0.25 || channel.name === "121.5") {
-          await playAudio(channel, "assets/meow.mp3");
-          console.log("Meowed successfully!");
-        }
-      }
-    });
-  });
-}
 
 client.once(Events.ClientReady, () => {
   console.log("Ready!");
-  setTimeout(playMeowOnGuilds, 1000 * 60 * 5);
-  playMeowOnGuilds();
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
