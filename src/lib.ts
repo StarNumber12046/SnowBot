@@ -1,16 +1,17 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGroq } from "@ai-sdk/groq";
 import {
   generateText,
   tool,
-  type FilePart,
-  type ImagePart,
   type TextPart,
 } from "ai";
 import { VoiceChannel, type Message } from "discord.js";
 import { z } from "zod/v3";
 import type { ClientType } from "./types.js";
-const googleClient = createGoogleGenerativeAI({
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+
+const MODEL = "moonshotai/kimi-k2-instruct-0905";
+
+const groqClient = createGroq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 const emojis: Record<string, { completeEmoji: string; description: string }> = {
@@ -112,6 +113,7 @@ function getMessageContentOrParts(message: Message) {
           id: message.id,
         }),
       } as TextPart,
+      /*
       ...(message.attachments.map((attachment) => {
         const isImage = attachment.contentType?.startsWith("image");
         if (isImage) {
@@ -127,6 +129,7 @@ function getMessageContentOrParts(message: Message) {
           mimeType: attachment.contentType,
         };
       }) as (ImagePart | FilePart)[]),
+      */
     ],
   };
 }
@@ -161,7 +164,7 @@ export async function genMistyOutput(
 
   try {
     const response = await generateText({
-      model: googleClient("gemini-2.0-flash-lite"),
+      model: groqClient(MODEL),
       system: systemPrompt,
       messages: messages
         .reverse()
@@ -170,13 +173,16 @@ export async function genMistyOutput(
         myself: myselfTool,
         sendMessage: sendMessageTool,
       },
-      toolChoice: "required",
+      // toolChoice: "required", // MorrisBot doesn't use this, so I'll comment it out.
     });
 
     const text = response.text;
     const toolResponse = response.toolResults[0]?.output;
     if (!toolResponse) {
-      return text;
+      return makeCompleteEmoji(text).replace(
+        /\b(?:i(?:['’])?m|i am)\s+a\s+d(o|0)g\w*\b([.!?])?/gi,
+        "I'm not a dog$1"
+      );
     }
     const { message } = toolResponse as {
       message: string;
