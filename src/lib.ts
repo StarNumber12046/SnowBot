@@ -8,7 +8,7 @@ import { VoiceChannel, type Message } from "discord.js";
 import { z } from "zod/v3";
 import type { ClientType } from "./types.js";
 
-const MODEL = "moonshotai/kimi-k2-instruct-0905";
+const MODEL = "openai/gpt-oss-120b";
 
 const groqClient = createGroq({
   apiKey: process.env.GROQ_API_KEY,
